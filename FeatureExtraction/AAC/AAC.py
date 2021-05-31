@@ -20,7 +20,7 @@ USAGE:
 """
 
 
-def AAC(fastas, gap, **kw):
+def AAC(fastas, **kw):
     AA = kw['order'] if kw['order'] != None else 'ACDEFGHIKLMNPQRSTVWY'
     encodings = []
     header = ['#']
@@ -42,7 +42,7 @@ kw = {'path': r"H_train.txt", 'order': 'ACDEFGHIKLMNPQRSTVWY'}
 
 if __name__ == "__main__":
     fastas1 = readFasta.readFasta(r"data.fasta")
-    result, header = AAC(fastas1, 1, **kw)
+    result, header = AAC(fastas1, **kw)
     data1 = np.matrix(result[1:])[:, 1:]
     data2 = np.matrix(result[1:])
 
