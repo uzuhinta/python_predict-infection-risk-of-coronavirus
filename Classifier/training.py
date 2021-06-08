@@ -11,19 +11,26 @@ from sklearn.metrics import accuracy_score
 np.random.seed(42)
 style.use('fivethirtyeight')
 
-if __name__ == "__main__":
+
+def prepare_data(factor):
     X = pd.read_csv(
-        "../FeatureExtraction/GGAP/GGAP_data.csv", index_col=0, header=1)
-    y = pd.read_csv("./target_data.csv", index_col=0, header=1)
-    # shuffle_indexes = np.arange(X.shape[0])
-    # np.random.shuffle(shuffle_indexes)
-    # image_data = X[shuffle_indexes]
-    # image_labels = y[shuffle_indexes]
+        "../FeatureExtraction/GGAP/GGAP_data.csv", index_col=0)
+    y = pd.read_csv("./target_data.csv", index_col=0)
+    reps = [factor if val == 1 else 1 for val in y.target]
+    X = X.loc[np.repeat(X.index.values, reps)]
+    y = y.loc[np.repeat(y.index.values, reps)]
+    return X, y
+
+
+if __name__ == "__main__":
+    X, y = prepare_data(4)
+    print(X.shape, y.shape)
+    # print(X.head(10))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     print(X_train.shape, X_test.shape,
           y_train.shape, y_test.values.ravel().shape)
     # Set the random state for reproducibility
-    fit_rf = RandomForestClassifier())
+    fit_rf = RandomForestClassifier()
     # fit_rf.set_params(n_estimators=400,
     #                   bootstrap=True,
     #                   warm_start=False,
@@ -31,6 +38,6 @@ if __name__ == "__main__":
     # Train the model using the training sets y_pred=clf.predict(X_test)
     fit_rf.fit(X_train, y_train.values.ravel())
     joblib.dump(fit_rf, "./random_forest.joblib")
-    y_pred=fit_rf.predict(X_test)
+    y_pred = fit_rf.predict(X_test)
 
     print("Accuracy:", accuracy_score(y_test.values.ravel(), y_pred))
