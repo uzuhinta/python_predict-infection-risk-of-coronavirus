@@ -25,26 +25,29 @@ def prepare_data(factor):
 
 if __name__ == "__main__":
     X, y = prepare_data(2)
-    kf = KFold(n_splits=10, random_state=123, shuffle=True)
+    kf = KFold(n_splits=10, shuffle=True)
     print(X.shape, y.shape)
-    # print(X.head(10))
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-    # print(X_train.shape, X_test.shape,
-    #       y_train.shape, y_test.values.ravel().shape)
-
     kf.get_n_splits(X)
+    ACC = []
+    recall = []
+    MCC = []
     for train_index, test_index in kf.split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
-        # print(type(X_train))
-        # print(X_train.shape, y_train.shape)
-        # print(X_test.shape, y_test.shape)
         # Set the random state for reproducibility
         fit_rf = RandomForestClassifier(n_estimators=500)
         fit_rf.fit(X_train, y_train.ravel())
         # joblib.dump(fit_rf, "./random_forest.joblib")
         y_pred = fit_rf.predict(X_test)
-
+        print("\n===============")
         print("ACC:", accuracy_score(y_test, y_pred))
+        ACC.append(accuracy_score(y_test, y_pred))
         print("recall_score:", recall_score(y_test, y_pred))
+        recall.append(recall_score(y_test, y_pred))
         print("MCC:", matthews_corrcoef(y_test, y_pred))
+        MCC.append(matthews_corrcoef(y_test, y_pred))
+    print("\n Summary")
+    print("ACC: min = {:.4f} & max =  {:.4f}".format(np.min(ACC), np.max(ACC)))
+    print("Recall: min = {:.4f} & max =  {:.4f}".format(
+        np.min(recall), np.max(recall)))
+    print("MCC: min = {:.4f} & max =  {:.4f}".format(np.min(MCC), np.max(MCC)))
